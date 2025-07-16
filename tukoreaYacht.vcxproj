@@ -20,9 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="socketClient.c" />
+    <ClCompile Include="socketServer.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
+    <ClInclude Include="socketClient.h" />
+    <ClInclude Include="socketServer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Test.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="tukoreaYacht.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
