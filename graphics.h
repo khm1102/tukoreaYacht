@@ -3,7 +3,7 @@
 #define GRAPHICS_H
 
 #include <stdio.h>
-#include "main.h"
+
 // 주사위 숫자 패턴 (6면 × 5행)
 extern const char* dicePatterns[6][5];
 
