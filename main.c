@@ -122,7 +122,7 @@ int main() {
                 char ip[64];
                 printf("서버 IP 입력: "); scanf("%63s", ip);
                 sock = setupClient(ip);
-                playNetworkGame(sock,/0);
+                playNetworkGame(sock,0);
             }
 
             if (sock != INVALID_SOCKET) closesocket(sock);
