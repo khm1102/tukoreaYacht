@@ -91,9 +91,7 @@ void playNetworkGame(SOCKET sock, int isServer) {
     }
 
     // 결과 출력
-    printf("\n=== 최종 점수 ===\n");
-    printf("%s : ", me);     print_PS(scoreSelf);
-    printf("%s : ", opponent); print_CS(scoreOpp);
+    print_MS(scoreSelf, scoreOpp);
 }
 
 int main() {

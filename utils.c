@@ -35,7 +35,7 @@ int calc_score(int category, int dice[])
     case 5:
         return calc_sum(dice, 6); // Sixes
     case 6:
-        return check_Y(dice) ? 50 : 0; // Yacht
+        return calc_sum(dice, 0); // Choice
     case 7:
         return check_FOK(dice); // Four of a Kind
     case 8:
@@ -50,7 +50,7 @@ int calc_score(int category, int dice[])
     }
     case 11:
     {
-        return calc_sum(dice, 0); // Choice
+        return check_Y(dice) ? 50 : 0; // Yacht
     }
     default:
         return 0;
@@ -360,6 +360,75 @@ void record_CS(int scores[], int dice[]) {
 
 }
 
+// 啪歜 醞 Ы溯檜橫諦 闡У攪 薄熱 轎溘
+void print_MS(int ply[], int com[]) {
+    int Ptotal = 0, Ctotal = 0;
+
+    for (int i = 0; i < 6; i++) {
+        Ptotal += ply[i];
+        Ctotal += com[i];
+    }
+
+    printf("%15s忙式式式式式式式式式式成式式式式式式式式式式忖\n", "式成式        ");
+    printf("%20s弛%10s弛%10s弛\n", " 弛 弛 弛忙式忙式忖", "", "");
+    printf("%19s弛%10s弛%10s弛\n", " 戌 戌式扛戌 戌 戌", "", "");
+    printf("%12s弛%10s弛%10s弛\n", "12/12", "player", "computer");
+    printf("忙式式式式式式式式式式式扣%10s弛%10s弛\n", "", "");
+    printf("弛%11s弛%10s弛%10s弛\n", "Categories", "", "");
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+
+    printf("弛%11s弛%10d弛%10d弛\n", "Aces", ply[0], com[0]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Deuces", ply[1], com[1]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Threes", ply[2], com[2]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Fours", ply[3], com[3]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Fives", ply[4], com[4]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Sixes", ply[5], com[5]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%7d%s弛%7d%s弛\n", "Subtotal", Ptotal, "/63", Ctotal, "/63");
+    printf("弛***********弛**********弛**********弛\n");
+
+    if (Ptotal == 63) {
+        Ptotal += 35;
+    }
+    if (Ctotal == 63) {
+        Ctotal += 35;
+    }
+
+    printf("弛%11s弛%10d弛%10d弛\n", "+35 Bonus", Ptotal, Ctotal);
+    printf("戌式式式式式式式式式式式扛式式式式式式式式式式扛式式式式式式式式式式戎\n");
+
+    printf("Bonus if 1 - 6 are over 63 points\n");
+
+    printf("忙式式式式式式式式式式式成式式式式式式式式式式成式式式式式式式式式式忖\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Choice", ply[6], com[6]);
+    printf("戌式式式式式式式式式式式扛式式式式式式式式式式扛式式式式式式式式式式戎\n");
+    printf("忙式式式式式式式式式式式成式式式式式式式式式式成式式式式式式式式式式忖\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "4 of a Kind", ply[7], com[7]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Full House", ply[8], com[8]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "S. Straight", ply[9], com[9]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "L. Straight", ply[10], com[10]);
+    printf("戍式式式式式式式式式式式托式式式式式式式式式式托式式式式式式式式式式扣\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Yacht", ply[11], com[11]);
+    printf("戌式式式式式式式式式式式扛式式式式式式式式式式扛式式式式式式式式式式戎\n");
+
+    for (int i = 6; i < 12; i++) {
+        Ptotal += ply[i];
+        Ctotal += com[i];
+    }
+
+    printf("忙式式式式式式式式式式式成式式式式式式式式式式成式式式式式式式式式式忖\n");
+    printf("弛%11s弛%10d弛%10d弛\n", "Total", Ptotal, Ctotal);
+    printf("戌式式式式式式式式式式式扛式式式式式式式式式式扛式式式式式式式式式式戎\n");
+}
+
 
 // 啪歜 醞 闡У攪 薄熱 轎溘
 void print_CS(int scores[]) {
@@ -409,19 +478,114 @@ void display_DWC(int dice[], int keep[], int cursor) {
     printf("\n");
 }
 
-void display_SB(int scores[], int numCategories) {
-    const char* categories[] = {
-        "1: Ones", "2: Twos", "3: Threes", "4: Fours", "5: Fives", "6: Sixes",
-        "7: Yacht", "8: Four of a Kind", "9: Full House",
-        "10: Little Straight", "11: Big Straight", "12: Choice"
-    };
+// 蝶囀橫爾萄 っ
+void scoreBoard(int score, int num) {
+    switch (num) {
+    case 0:
+        printf("%15s忙式式式式式式式式式式忖\n", "式成式        ");
+        printf("%20s弛%10s弛\n", " 弛 弛 弛忙式忙式忖", "");
+        printf("%19s弛%10s弛\n", " 戌 戌式扛戌 戌 戌", "");
+        printf("%12s弛%10s弛\n", "12/12", "player");
+        printf("忙式式式式式式式式式式式扣%10s弛\n", "");
+        printf("弛%11s弛%10s弛\n", "Categories", "");
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
 
-    // printf("\n======== Scoreboard ========\n");
-    printf("\n======== 蝶囀橫爾萄 ========\n");
-    for (int i = 0; i < numCategories; i++) {
-        printf("%-20s: %d points\n", categories[i], scores[i]);
+        printf("弛%11s弛%10d弛\n", "Aces", score);
+        break;
+
+    case 1:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "Deuces", score);
+        break;
+
+    case 2:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "Threes", score);
+        break;
+
+    case 3:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "Fours", score);
+        break;
+
+    case 4:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "Fives", score);
+        break;
+
+    case 5:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "Sixes", score);
+        break;
+
+    case 6:
+        printf("Bonus if 1 - 6 are over 63 points\n");
+
+        printf("忙式式式式式式式式式式式成式式式式式式式式式式忖\n");
+        printf("弛%11s弛%10d弛\n", "Choice", score);
+        break;
+
+    case 7:
+        printf("戌式式式式式式式式式式式扛式式式式式式式式式式戎\n");
+        printf("忙式式式式式式式式式式式成式式式式式式式式式式忖\n");
+        printf("弛%11s弛%10d弛\n", "4 of a Kind", score);
+        break;
+
+    case 8:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "Full House", score);
+        break;
+
+    case 9:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "S. Straight", score);
+        break;
+
+    case 10:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "L. Straight", score);
+        break;
+
+    case 11:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%10d弛\n", "Yacht", score);
+        printf("戌式式式式式式式式式式式扛式式式式式式式式式式戎\n");
+        break;
+
+    case 12:
+        printf("戍式式式式式式式式式式式托式式式式式式式式式式扣\n");
+        printf("弛%11s弛%7d%s弛\n", "Subtotal", score, "/63");
+        printf("弛***********弛**********弛\n");
+        break;
+
+    case 13:
+        printf("弛%11s弛%10d弛\n", "+35 Bonus", score);
+        printf("戌式式式式式式式式式式式扛式式式式式式式式式式戎\n");
+        break;
+
+    case 14:
+        printf("忙式式式式式式式式式式式成式式式式式式式式式式忖\n");
+        printf("弛%11s弛%10d弛\n", "Total", score);
+        printf("戌式式式式式式式式式式式扛式式式式式式式式式式戎\n\n");
+        break;
     }
-    printf("============================\n");
+}
+
+void display_SB(int scores[], int numCategories) {
+    int total = 0;
+
+    for (int i = 0; i < numCategories; i++) {
+        if (i == 6) {
+            if (total == 63) {
+                total += 35;
+            }
+            scoreBoard(total, 12);
+            scoreBoard(total, 13);
+        }
+        scoreBoard(scores[i], i);
+        total += scores[i];
+    }
+    scoreBoard(total, 14);
 }
 
 // 譆謙 摹鷗 鼻鷓 �挫� л熱

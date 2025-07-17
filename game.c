@@ -74,7 +74,7 @@ void playMode1() {
     // 최종 점수 집계 및 출력
     printf("\n=== 최종 점수 ===\n");
     print_PS(PS);
-
+    
     int total = 0;
     int upper = calc_upper_s(PS);
     if (upper >= 63) {

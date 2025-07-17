@@ -3,46 +3,46 @@
 // 주사위 숫자 패턴을 정의
 const char* dicePatterns[6][5] = {
     {
-        "*********",
-        "*       *",
-        "*   *   *",
-        "*       *",
-        "*********"
+        "┌───────┐",
+        "│       │",
+        "│   ●   │",
+        "│       │",
+        "└───────┘"
     },
     {
-        "*********",
-        "* *     *",
-        "*       *",
-        "*     * *",
-        "*********"
+        "┌───────┐",
+        "│  ●    │",
+        "│       │",
+        "│    ●  │",
+        "└───────┘"
     },
     {
-        "*********",
-        "* *     *",
-        "*   *   *",
-        "*     * *",
-        "*********"
+        "┌───────┐",
+        "│ ●     │",
+        "│   ●   │",
+        "│     ● │",
+        "└───────┘"
     },
     {
-        "*********",
-        "* *   * *",
-        "*       *",
-        "* *   * *",
-        "*********"
+        "┌───────┐",
+        "│ ●   ● │",
+        "│       │",
+        "│ ●   ● │",
+        "└───────┘"
     },
     {
-        "*********",
-        "* *   * *",
-        "*   *   *",
-        "* *   * *",
-        "*********"
+        "┌───────┐",
+        "│ ●   ● │",
+        "│   ●   │",
+        "│ ●   ● │",
+        "└───────┘"
     },
     {
-        "*********",
-        "* *   * *",
-        "* *   * *",
-        "* *   * *",
-        "*********"
+        "┌───────┐",
+        "│ ●   ● │",
+        "│ ●   ● │",
+        "│ ●   ● │",
+        "└───────┘"
     }
 };
 
@@ -59,17 +59,20 @@ void displayAllDiceHorizontal(int dice[], int numDice) {
 
 // 점수판 출력 함수
 void displayScoreboard(int scores[], int numCategories) {
-    const char* categories[] = {
-        "1: Ones", "2: Twos", "3: Threes", "4: Fours", "5: Fives", "6: Sixes",
-        "7: Yacht", "8: Four of a Kind", "9: Full House",
-        "10: Little Straight", "11: Big Straight", "12: Choice"
-    };
+    int total = 0;
 
-    printf("\n======== Scoreboard ========\n");
     for (int i = 0; i < numCategories; i++) {
-        printf("%-20s: %d points\n", categories[i], scores[i]);
+        if (i == 6) {
+            if (total == 63) {
+                total += 35;
+            }
+            scoreBoard(total, 12);
+            scoreBoard(total, 13);
+        }
+        scoreBoard(scores[i], i);
+        total += scores[i];
     }
-    printf("============================\n");
+    scoreBoard(total, 14);
 }
 //시작 할 때 게임 제목 출력
 void displayWelcomeScreen() {
