@@ -366,6 +366,7 @@ int check_Y(int dice[])
     }
     return 1;
 }
+
 // Four of a Kind 점수 계산 : 4개의 눈이 같을 때
 int check_FOK(int dice[])
 {

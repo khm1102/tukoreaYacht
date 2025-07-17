@@ -9,10 +9,9 @@
 #include <Windows.h>
 #include "graphics.h"
 
-
-
 #define NUM_DICE 5
 #define NUM_CATEGORIES 12
+
 //키보드 입력값
 #define ARROW 224
 #define LEFT 75
@@ -20,6 +19,7 @@
 #define SPACEBAR 32
 #define ENTER 13
 #define ESC 27
+
 //출력되는 글자 색
 #define SELECTED_COLOR 10 // 녹색
 #define CURSOR_COLOR 9    // 파란색

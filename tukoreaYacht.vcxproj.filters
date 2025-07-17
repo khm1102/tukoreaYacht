@@ -46,7 +46,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Test.txt">
+    <Text Include="gameRule.txt">
       <Filter>소스 파일\database</Filter>
     </Text>
   </ItemGroup>
