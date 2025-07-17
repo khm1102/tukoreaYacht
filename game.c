@@ -17,7 +17,7 @@ void playMode1() {
 
     // 점수 초기화
     for (int i = 0; i < NUM_CATEGORIES; i++) {
-        PS[i] = -1;
+        PS[i] = 0;
     }
     // 보관 플래그 초기화
     for (int i = 0; i < NUM_DICE; i++) {
@@ -48,19 +48,22 @@ void playMode1() {
                 printf("보관하거나 다시 굴릴 주사위를 선택하세요.\n");
                 dice_S(dice, keep);
             }
+            if (roll == 2) system("cls");
         }
 
         // 카테고리 선택 및 점수 확정
         int chosen = 0;
+        int category = 0;
+
         while (!chosen) {
             displayDice(dice);
-            print_PS(PS);
+            // print_PS(PS);
+            scoreBoard(PS);
             printf("카테고리를 선택하세요 (1:Ones … 12:Choice): ");
-            int category;
             scanf("%d", &category);
             category--;
 
-            if (category >= 0 && category < NUM_CATEGORIES && PS[category] == -1) {
+            if (category >= 0 && category < NUM_CATEGORIES && PS[category] == 0) {
                 PS[category] = calc_score(category, dice);
                 printf("획득 점수: %d\n", PS[category]);
                 chosen = 1;

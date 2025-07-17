@@ -22,21 +22,21 @@
     <ClCompile Include="game.c" />
     <ClCompile Include="gamePrint.c" />
     <ClCompile Include="graphics.c" />
+    <ClCompile Include="localUser.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="socket.c" />
-    <ClCompile Include="socketServer.c" />
     <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
     <ClInclude Include="gamePrint.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="localUser.h" />
     <ClInclude Include="socket.h" />
-    <ClInclude Include="socketClient.h" />
-    <ClInclude Include="socketServer.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="localUser.txt" />
     <Text Include="Tutorial.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

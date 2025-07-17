@@ -1,5 +1,5 @@
 #pragma once
-#ifndef __UTILS__
+#ifndef UTILS_H
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,5 +48,5 @@ void display_SB(int scores[], int numCategories);
 int select_confirm(int dice[], int keep[]);
 void dice_S(int dice[], int keep[]);
 
-
+void print_MS(int ply[], int com[], int* localData, int* comData);
 #endif

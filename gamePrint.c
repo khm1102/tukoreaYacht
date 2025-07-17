@@ -1,10 +1,11 @@
-#include "gamePrint.h"
+ï»¿#include "gamePrint.h"
 
-int main(void) {
+void printTutorial() {
+
     FILE* fp = fopen("Tutorial.txt", "r");
 
     if (fp == NULL) {
-        printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
+        printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
         return 1;
     }
 
@@ -14,6 +15,4 @@ int main(void) {
     }
 
     fclose(fp);
-
-    return 0;
 }
