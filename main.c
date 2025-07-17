@@ -10,7 +10,8 @@ void setColor(int color) {
 // 주사위 출력 함수 (커서와 선택 상태 표시)
 void display_DWC(int dice[], int keep[], int cursor) {
     system("cls"); // 화면 초기화
-    printf("Use arrow keys to move, SPACE to toggle selection, ENTER to confirm, ESC to exit.\n");
+    // printf("Use arrow keys to move, SPACE to toggle selection, ENTER to confirm, ESC to exit.\n");
+    printf("방향키(<-, ->)를 사용하여 이동하고, SPACE를 선택을 전환하고, ENTER를 눌러 확인하며, ESC를 종료합니다.\n");
 
     for (int i = 0; i < NUM_DICE; i++) {
         if (i == cursor) {
@@ -36,7 +37,8 @@ void display_SB(int scores[], int numCategories) {
         "10: Little Straight", "11: Big Straight", "12: Choice"
     };
 
-    printf("\n======== Scoreboard ========\n");
+    // printf("\n======== Scoreboard ========\n");
+    printf("\n======== 스코어보드 ========\n");
     for (int i = 0; i < numCategories; i++) {
         printf("%-20s: %d points\n", categories[i], scores[i]);
     }
@@ -46,8 +48,8 @@ void display_SB(int scores[], int numCategories) {
 // 최종 선택 상태 확인 함수
 int select_confirm(int dice[], int keep[]) {
     system("cls");
-    printf("Confirm your selection:\n");
-
+    // printf("Confirm your selection:\n");
+    printf("선택 확인:\n");
     for (int i = 0; i < NUM_DICE; i++) {
         if (keep[i]) {
             setColor(SELECTED_COLOR); // 선택된 주사위는 녹색
@@ -58,8 +60,8 @@ int select_confirm(int dice[], int keep[]) {
         printf(" %d ", dice[i]);
     }
     setColor(DEFAULT_COLOR); // 색상 초기화
-    printf("\nPress ENTER to confirm or ESC to go back.\n");
-
+    // printf("\nPress ENTER to confirm or ESC to go back.\n");
+    printf("\nENTER: 계속 ESC: 뒤로가기\n");
     while (1) {
         int key = _getch();
         if (key == ENTER) {
@@ -95,7 +97,8 @@ void dice_S(int dice[], int keep[]) {
         }
         else if (key == ENTER) {
             if (select_confirm(dice, keep)) {
-                printf("Selection confirmed. Re-rolling dice...\n");
+                // printf("Selection confirmed. Re-rolling dice...\n");
+                printf("주사위를 다시 굴리는 중입나다...\n");
                 Sleep(1000); // 1초 대기 후 종료
                 running = 0;
             }
@@ -114,7 +117,7 @@ int main() {
     int dice[NUM_DICE];       // 현재 주사위 눈
     // int keep[NUM_DICE] = { 0 }; // 유지할 주사위 표시
     int PS[NUM_CATEGORIES];
-    int CS[NUM_CATEGORIES];
+    int CS[NUM_CATEGORIES]; 
     int category, roll, i, mode;
     int* keep;
     char ip[20];
@@ -127,13 +130,14 @@ int main() {
         CS[i] = -1;  // -1로 초기화
     }
 
-    srand(time(0)); // 랜덤 시드 설정
+    srand(time(NULL)); // 랜덤 시드 설정
 
-    printf("Welcome to Yacht Dice!\n");
-    printf("\nEnter a number to select a mode (1: Single play, 2: VS Computer, 3: IP): ");
+    // printf("Welcome to Yacht Dice!\n");
+    printf("YACHT DICE에 어서오세요!\n");
+    // printf("\nEnter a number to select a mode (1: Single play, 2: VS Computer, 3: IP): ");
+    printf("\n원하시는 모드를 선택하세요 (1: 솔로, 2: VS computer, 3: 방 만들기 4: 방 참가, 5: 게임 설명, 0: 게임 종료): ");
     scanf("%d", &mode);
 
-    // Easter Egg!
     if (mode == 123456) {
         system("cls");
         printf("================================\n");
@@ -153,10 +157,11 @@ int main() {
     }
 
     for (int turn = 0; turn < NUM_CATEGORIES; turn++) {
-        printf("\n--- Turn %d ---\n", turn + 1);
+        printf("\n--- %d / 12 ---\n", turn + 1);
 
         // 플레이어 턴
         if (mode == 2) {
+            // printf("\nYour turn!\n");
             printf("\nYour turn!\n");
         }
 
@@ -167,12 +172,14 @@ int main() {
         // 주사위 굴리기 최대 3번
         for (roll = 0; roll < 3; roll++) {
             rollDice(dice, keep);
-            printf("\nPress any key to continue...\n");
+            printf("\n계속하시려면 아무키나 누르세요...\n");
             _getch(); // 사용자가 키를 누를 때까지 대기
-            printf("\nRoll %d: \n", roll + 1);
+            // printf("\nRoll %d: \n", roll + 1);
+            printf("\n%d번째 주사위: \n", roll + 1);
 
             if (roll < 2) {
-                printf("You can choose which dice to keep or re-roll.\n");
+                // printf("You can choose which dice to keep or re-roll.\n");
+                printf("보관하거나 다시 굴릴 주사위를 선택 할 수 있습니다.\n");
                 dice_S(dice, keep); // 화살표 키를 사용해 주사위 선택
             }
         }
@@ -181,17 +188,20 @@ int main() {
         while (chosen) {
             displayDice(dice);
             print_PS(PS); // 플레이어 점수 출력
-            printf("Choose a category (1:Ones, 2:Twos, 3:Threes, 4:Fours, 5:Fives, 6:Sixes, 7:Yacht, 8:Four of a Kind, 9:Full House, 10:Little Straight, 11:Big Straight, 12:Choice): ");
+            // printf("Choose a category (1:Ones, 2:Twos, 3:Threes, 4:Fours, 5:Fives, 6:Sixes, 7:Yacht, 8:Four of a Kind, 9:Full House, 10:Little Straight, 11:Big Straight, 12:Choice): ");
+            printf("카테고리를 선택하세요. (1:Ones, 2:Twos, 3:Threes, 4:Fours, 5:Fives, 6:Sixes, 7:Yacht, 8:Four of a Kind, 9:Full House, 10:Little Straight, 11:Big Straight, 12:Choice): ");
             scanf("%d", &category);
             category--; // 배열 인덱스 맞추기
 
             if (PS[category] == -1) { // 아직 선택되지 않은 카테고리
                 PS[category] = calc_score(category, dice);
-                printf("You scored %d points in this category.\n", PS[category]);
+                // printf("You scored %d points in this category.\n", PS[category]);
+                printf("Player의 점수는: %d\n", PS[category]);
                 chosen = 0;
             }
             else {
-                printf("Category already chosen, try another category.\n");
+                // printf("Category already chosen, try another category.\n");
+                printf("이미 선택된 카테고리입니다. 다른 카테고리를 선택하세요.\n");
             }
         }
 
@@ -207,7 +217,9 @@ int main() {
             // 컴퓨터 주사위 굴리기 (3회)
             for (roll = 0; roll < 3; roll++) {
                 rollDice(dice, keep);
-                printf("\nComputer's Roll %d: \n", roll + 1);
+                // printf("\nComputer's Roll %d: \n", roll + 1);
+                printf("\nComputer의 %d첫번째 주사위: \n", roll + 1);
+
 
 
                 // 첫 번째와 두 번째 굴림에서는 주사위 선택 로직 수행
@@ -231,36 +243,56 @@ int main() {
     }
 
     // 최종 점수 출력
-    printf("\nFinal Scores:\n");
+    // printf("\nFinal Scores:\n");
+    printf("\n최종 점수:\n");
     print_PS(PS);
     if (mode == 2) {
         print_CS(CS);
 
         int total_PS = 0, total_CS = 0;
+        int upper_PS = calc_upper_s(PS);
+		int upper_CS = calc_upper_s(CS);
         for (i = 0; i < NUM_CATEGORIES; i++) {
             if (PS[i] != -1) total_PS += PS[i];
             if (CS[i] != -1) total_CS += CS[i];
         }
+        if (upper_PS >= 63) {
+            total_PS += 35;
+            printf("Player가 63점 이상으로 보너스 35점 획득\n");
+        }
 
-        printf("Your total score: %d\n", total_PS);
-        printf("Computer's total score: %d\n", total_CS);
+        if (upper_CS >= 63) {
+            total_CS += 35;
+            printf("computer가 63점 이상으로 보너스 35점 획득\n");
+        }
+
+        // printf("Your total score: %d\n", total_PS);
+        // printf("Computer's total score: %d\n", total_CS);
+        printf("Player의 총점: %d\n", total_PS);
+        printf("Computer의 총점: %d\n", total_CS);
 
         if (total_PS > total_CS) {
-            printf("You Won!\n");
+            printf("You Win!\n");
         }
         else if (total_PS < total_CS) {
-            printf("You Lost!\n");
+            printf("You Lose!\n");
         }
         else {
-            printf("It's a Draw!\n");
+            printf("Draw!\n");
         }
     }
     else {
         int total_PS_2 = 0;
+        int upper_PS = calc_upper_s(PS);
+        if (upper_PS >= 63) {
+            printf("63점 이상으로 보너스 35점 획득!\n");
+            total_PS_2 += 35;
+        }
         for (i = 0; i < NUM_CATEGORIES; i++) {
             if (PS[i] != -1) total_PS_2 += PS[i];
         }
-        printf("Your total score: %d\n", total_PS_2);
+        // printf("Your total score: %d\n", total_PS_2);
+        printf("Player의 총점: %d\n", total_PS_2);
     }
 
     printf("\nPlayer");
@@ -277,6 +309,12 @@ int main() {
         scanf("%s", ip);
         printf("IP: %s", ip);
     }
+
+    if (mode == 4) {}
+    if (mode == 5) {}
+    if (mode == 6) {}
+
+    free(keep);
     return 0;
 }
 
@@ -296,7 +334,7 @@ void rollDice(int dice[], int keep[]) {
 
 // 주사위 출력
 void displayDice(int dice[]) {
-    printf("Current dice:\n");
+    printf("주사위:\n");
     displayAllDiceHorizontal(dice, NUM_DICE); // 주사위 배열과 주사위 개수 전달
     printf("\n");
 }
@@ -341,6 +379,18 @@ int calc_score(int category, int dice[])
         return 0;
     }
 }
+
+int calc_upper_s(int scores[])
+{
+    int sum = 0;
+    for (int i = 0; i < 6; i++) {
+        if (scores[i] != -1) {
+            sum += scores[i];
+        }
+    }
+    return sum;
+}
+
 // 특정 숫자 합산
 int calc_sum(int dice[], int num)
 {
@@ -378,7 +428,8 @@ int check_FOK(int dice[])
     {
         if (counts[i] >= 4)
         {
-            return i * 4;
+            return (i + 1) * 4;
+            // return i * 4;
         }
     }
     return 0;
@@ -413,8 +464,10 @@ int check_LS(int dice[])
     {
         int result = counts[i] * counts[i + 1] * counts[i + 2] * counts[i + 3];
         if (result != 0)
-            return counts[i] && counts[i + 1] && counts[i + 2] && counts[i + 3];
+            //return counts[i] && counts[i + 1] && counts[i + 2] && counts[i + 3];
+            return 1;
     }
+    return 0;
 }
 // Big Straight 점수 계산 : 5개가 연속수일 때
 int check_BS(int dice[])
@@ -424,12 +477,39 @@ int check_BS(int dice[])
     {
         counts[dice[i] - 1]++;
     }
+    /*
     for (int i = 0; i < 2; i++)
     {
         int result = counts[i] * counts[i + 1] * counts[i + 2] * counts[i + 3] * counts[i + 4];
         if (result != 0)
-            return counts[i] && counts[i + 1] && counts[i + 2] && counts[i + 3] && counts[i + 4];
+            //return counts[i] && counts[i + 1] && counts[i + 2] && counts[i + 3] && counts[i + 4];
+            return 1;
     }
+    */
+    
+    if (counts[0] == 1 && counts[2] == 1 && counts[3] == 1 && counts[4] == 1 && counts[5] == 1)
+        return 1;
+    if (counts[2] == 1 && counts[3] == 1 && counts[4] == 1 && counts[5] == 1 && counts[6] == 1)
+        return 1;
+    /*
+    for (int i = 0; i <= 1; i++) 
+    {
+        int straight = 1;
+        for (int j = i; j < i + 5; j++) 
+        {
+            if (counts[j] == 0)
+            {
+                straight = 0;
+                break;
+            }
+        }
+        if (straight)
+        {
+            return 1;
+        }
+    }
+    */
+    return 0;
 }
 
 // 컴퓨터 최적 카테고리 선택
@@ -605,7 +685,8 @@ void decide_KD(int dice[], int keep[], int target_C) {
         break;
 
     default:
-        printf("Invalid category!\n");
+        // printf("Invalid category!\n");
+        printf("없는 카테고리입니다!\n");
         break;
     }
 }
@@ -615,13 +696,15 @@ void record_CS(int scores[], int dice[]) {
     int choice_C = choice_BC(scores, dice);
     int score = calc_score(choice_C, dice);
     scores[choice_C] = score; // 해당 카테고리에 점수 기록
-    printf("Computer scored %d points in category %d.\n", score, choice_C + 1);
+    // printf("Computer scored %d points in category %d.\n", score, choice_C + 1);
+    printf("Computer의 %d번째 카테고리에 %d점수를 얻었습니다.\n", choice_C + 1, score);
+
 }
 
 
 // 게임 중 컴퓨터 점수 출력
 void print_CS(int scores[]) {
-    printf("Computer scores: ");
+    printf("Computer의 점수: ");
     for (int i = 0; i < NUM_CATEGORIES; i++) {
         if (scores[i] == -1) printf("[ ] "); // 미사용 카테고리
         else printf("[%d] ", scores[i]);
@@ -631,7 +714,7 @@ void print_CS(int scores[]) {
 
 // 게임 중 플레이어 점수 출력
 void print_PS(int scores[]) {
-    printf("\nPlayer scores: ");
+    printf("\nPlayer의 점수: ");
     for (int i = 0; i < NUM_CATEGORIES; i++) {
         if (scores[i] == -1) printf("[ ] "); // 미사용 카테고리
         else printf("[%d] ", scores[i]); // 기록된 점수
