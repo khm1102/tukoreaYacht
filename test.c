@@ -1,22 +1,23 @@
 ﻿// main.c
 #define _CRT_SECURE_NO_WARNINGS
-
-#include "main.h"
-#include "graphics.h"
-
-#include <winsock2.h>
+#define WIN32_LEAN_AND_MEAN            // Windows.h 포함 시 winsock.h 중복을 막음
+#include <winsock2.h>                  // 반드시 Windows.h 앞
 #include <ws2tcpip.h>
+#include <Windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <conio.h>
-#include <Windows.h>
+
+#include "main.h"
+#include "graphics.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#define BUF_SIZE 512
+#define BUF_SIZE        512
 
+// 네트워크로 주고받을 한 턴의 정보
 typedef struct {
     int dice[NUM_DICE];
     int keep[NUM_DICE];
@@ -24,172 +25,366 @@ typedef struct {
     int score;
 } TurnData;
 
-//----------------------------------------------------------------------
-// 네트워크 헬퍼
-static int recvAll(SOCKET sock, char* buf, int len) {
-    int total = 0, r;
-    while (total < len) {
-        r = recv(sock, buf + total, len - total, 0);
+
+//-----------------------------------------------------------------------------
+// ▶ UI 함수
+void setColor(int color) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+
+void displayDice(int dice[]) {
+    printf("Current dice:\n");
+    displayAllDiceHorizontal(dice, NUM_DICE);
+    printf("\n");
+}
+
+void rollDice(int dice[], int keep[]) {
+    for (int i = 0; i < NUM_DICE; i++)
+        if (!keep[i])
+            dice[i] = rand() % 6 + 1;
+    displayDice(dice);
+}
+
+void display_DWC(int dice[], int keep[], int cursor) {
+    system("cls");
+    printf("Use ↔ to move, SPACE to toggle, ENTER to confirm, ESC to exit\n");
+    for (int i = 0; i < NUM_DICE; i++) {
+        if (i == cursor)      setColor(CURSOR_COLOR);
+        else if (keep[i])     setColor(SELECTED_COLOR);
+        else                  setColor(DEFAULT_COLOR);
+        printf(" %d ", dice[i]);
+        setColor(DEFAULT_COLOR);
+    }
+    printf("\n");
+}
+
+int select_confirm(int dice[], int keep[]) {
+    system("cls");
+    printf("Confirm selection:\n");
+    for (int i = 0; i < NUM_DICE; i++) {
+        setColor(keep[i] ? SELECTED_COLOR : DEFAULT_COLOR);
+        printf(" %d ", dice[i]);
+    }
+    setColor(DEFAULT_COLOR);
+    printf("\nENTER=OK, ESC=Back\n");
+    while (1) {
+        int k = _getch();
+        if (k == ENTER) return 1;
+        if (k == ESC)   return 0;
+    }
+}
+
+void dice_S(int dice[], int keep[]) {
+    int cursor = 0, run = 1;
+    while (run) {
+        display_DWC(dice, keep, cursor);
+        int k = _getch();
+        if (k == ARROW && (k = _getch()) == LEFT)   cursor = (cursor + NUM_DICE - 1) % NUM_DICE;
+        else if (k == ARROW && k == RIGHT)               cursor = (cursor + 1) % NUM_DICE;
+        else if (k == SPACEBAR)                         keep[cursor] ^= 1;
+        else if (k == ENTER && select_confirm(dice, keep)) {
+            Sleep(500);
+            run = 0;
+        }
+        else if (k == ESC) { Sleep(500); run = 0; }
+    }
+}
+
+void print_PS(int sc[]) {
+    printf("\nPlayer:   ");
+    for (int i = 0; i < NUM_CATEGORIES; i++)
+        printf(sc[i] == -1 ? "[  ] " : "[%2d] ", sc[i]);
+    printf("\n");
+}
+
+void print_CS(int sc[]) {
+    printf("Computer: ");
+    for (int i = 0; i < NUM_CATEGORIES; i++)
+        printf(sc[i] == -1 ? "[  ] " : "[%2d] ", sc[i]);
+    printf("\n");
+}
+
+
+//-----------------------------------------------------------------------------
+// ▶ 점수 계산 함수
+int calc_sum(int d[], int n) {
+    int s = 0;
+    for (int i = 0; i < NUM_DICE; i++)
+        if (n == 0 || d[i] == n) s += d[i];
+    return s;
+}
+
+int check_Y(int d[]) {
+    for (int i = 1; i < NUM_DICE; i++) if (d[i] != d[0]) return 0;
+    return 1;
+}
+
+int check_FOK(int d[]) {
+    int cnt[7] = { 0 };
+    for (int i = 0; i < NUM_DICE; i++) cnt[d[i]]++;
+    for (int v = 1; v <= 6; v++)
+        if (cnt[v] >= 4) return v * 4;
+    return 0;
+}
+
+int check_FH(int d[]) {
+    int cnt[7] = { 0 }, two = 0, three = 0;
+    for (int i = 0; i < NUM_DICE; i++) cnt[d[i]]++;
+    for (int v = 1; v <= 6; v++) {
+        if (cnt[v] == 2) two = 1;
+        if (cnt[v] == 3) three = 1;
+    }
+    return two && three;
+}
+
+int check_LS(int d[]) {
+    int cnt[7] = { 0 };
+    for (int i = 0; i < NUM_DICE; i++) cnt[d[i]]++;
+    for (int s = 1; s <= 3; s++)
+        if (cnt[s] && cnt[s + 1] && cnt[s + 2] && cnt[s + 3])
+            return 1;
+    return 0;
+}
+
+int check_BS(int d[]) {
+    int cnt[7] = { 0 };
+    for (int i = 0; i < NUM_DICE; i++) cnt[d[i]]++;
+    if (cnt[1] && cnt[2] && cnt[3] && cnt[4] && cnt[5]) return 1;
+    if (cnt[2] && cnt[3] && cnt[4] && cnt[5] && cnt[6]) return 1;
+    return 0;
+}
+
+int calc_score(int cat, int d[]) {
+    switch (cat) {
+    case 0:  return calc_sum(d, 1);
+    case 1:  return calc_sum(d, 2);
+    case 2:  return calc_sum(d, 3);
+    case 3:  return calc_sum(d, 4);
+    case 4:  return calc_sum(d, 5);
+    case 5:  return calc_sum(d, 6);
+    case 6:  return check_Y(d) ? 50 : 0;
+    case 7:  return check_FOK(d);
+    case 8:  return check_FH(d) ? 25 : 0;
+    case 9:  return check_LS(d) ? 30 : 0;
+    case 10: return check_BS(d) ? 40 : 0;
+    case 11: return calc_sum(d, 0);
+    }
+    return 0;
+}
+
+int choice_BC(int sc[], int d[]) {
+    int best = 0, mx = -1;
+    for (int i = 0; i < NUM_CATEGORIES; i++) {
+        if (sc[i] != -1) continue;
+        int v = calc_score(i, d);
+        if (v > mx) { mx = v; best = i; }
+    }
+    return best;
+}
+
+void decide_KD(int d[], int keep[], int tc) {
+    memset(keep, 0, sizeof(int) * NUM_DICE);
+    if (tc <= 5) {
+        for (int i = 0; i < NUM_DICE; i++)
+            if (d[i] == tc + 1) keep[i] = 1;
+    }
+    else if (tc == 6 && check_Y(d)) {
+        for (int i = 0; i < NUM_DICE; i++) keep[i] = 1;
+    }
+    else if (tc == 7) {
+        int cnt[7] = { 0 };
+        for (int i = 0; i < NUM_DICE; i++) cnt[d[i]]++;
+        for (int v = 1; v <= 6; v++) {
+            if (cnt[v] >= 4) for (int i = 0; i < NUM_DICE; i++)
+                if (d[i] == v) keep[i] = 1;
+        }
+    }
+    else if (tc == 8 && check_FH(d)) {
+        int cnt[7] = { 0 };
+        for (int i = 0; i < NUM_DICE; i++) cnt[d[i]]++;
+        for (int v = 1; v <= 6; v++) {
+            if (cnt[v] == 2 || cnt[v] == 3)
+                for (int i = 0; i < NUM_DICE; i++)
+                    if (d[i] == v) keep[i] = 1;
+        }
+    }
+    else if ((tc == 9 && check_LS(d)) || (tc == 10 && check_BS(d))) {
+        // straight: keep any part of it
+        for (int i = 0; i < NUM_DICE; i++) {
+            if ((tc == 9 && d[i] >= 1 && d[i] <= 4) ||
+                (tc == 10 && (d[i] <= 5 && d[i] >= 1)) ||
+                (tc == 10 && (d[i] >= 2 && d[i] <= 6)))
+                keep[i] = 1;
+        }
+    }
+    else if (tc == 11) {
+        for (int i = 0; i < NUM_DICE; i++) keep[i] = 1;
+    }
+}
+
+void record_CS(int sc[], int d[]) {
+    int c = choice_BC(sc, d);
+    sc[c] = calc_score(c, d);
+    printf("Computer scored %d in category %d\n", sc[c], c + 1);
+}
+
+
+//-----------------------------------------------------------------------------
+// ▶ 네트워크 헬퍼
+static int recvAll(SOCKET s, char* buf, int len) {
+    int r, pos = 0;
+    while (pos < len) {
+        r = recv(s, buf + pos, len - pos, 0);
         if (r <= 0) return 0;
-        total += r;
+        pos += r;
     }
     return 1;
 }
 
-void sendTurnData(SOCKET sock, TurnData* td) {
-    send(sock, (char*)td, sizeof(TurnData), 0);
+void sendTurnData(SOCKET s, TurnData* td) {
+    send(s, (char*)td, sizeof(*td), 0);
 }
 
-int recvTurnData(SOCKET sock, TurnData* td) {
-    return recvAll(sock, (char*)td, sizeof(TurnData));
+int recvTurnData(SOCKET s, TurnData* td) {
+    return recvAll(s, (char*)td, sizeof(*td));
 }
 
-//----------------------------------------------------------------------
-// 한 플레이어 턴 (로컬)
-void playLocalTurn(int scores[], TurnData* td) {
-    int dice[NUM_DICE], keepArr[NUM_DICE] = { 0 };
-    int roll, chosen = 1;
 
-    // 최대 3번 굴리기
-    for (roll = 0; roll < 3; roll++) {
-        rollDice(dice, keepArr);
-        printf("\nRoll %d:\n", roll + 1);
-        displayDice(dice);
-        if (roll < 2) {
-            printf("Use arrows/SPACE to keep dice, ENTER to confirm.\n");
-            dice_S(dice, keepArr);
+//-----------------------------------------------------------------------------
+// ▶ 한 로컬 턴 실행 (내 턴)
+void playLocalTurn(int sc[], TurnData* td) {
+    int dice[NUM_DICE], keep[NUM_DICE] = { 0 };
+
+    // 최대 3번
+    for (int r = 0; r < 3; r++) {
+        rollDice(dice, keep);
+        printf("Roll %d complete.\n", r + 1);
+        if (r < 2) {
+            printf("Select dice to keep...\n"); dice_S(dice, keep);
         }
     }
 
     // 카테고리 선택
-    while (chosen) {
-        displayDice(dice);
-        print_PS(scores);
+    int done = 0;
+    while (!done) {
+        displayDice(dice); print_PS(sc);
         printf("Choose category (1-12): ");
-        int cat;
-        scanf("%d", &cat);
-        cat--;
-        if (cat >= 0 && cat < NUM_CATEGORIES && scores[cat] == -1) {
-            scores[cat] = calc_score(cat, dice);
-            printf("You scored %d points.\n", scores[cat]);
-            td->category = cat;
-            td->score = scores[cat];
-            chosen = 0;
+        int c; scanf("%d", &c); c--;
+        if (c >= 0 && c < NUM_CATEGORIES && sc[c] == -1) {
+            sc[c] = calc_score(c, dice);
+            printf("You scored %d\n", sc[c]);
+            td->category = c;
+            td->score = sc[c];
+            done = 1;
         }
         else {
-            printf("Invalid or already used category.\n");
+            printf("Invalid / used category.\n");
         }
     }
 
-    // 턴데이터에 주사위 상태 저장
+    // 턴 데이터 기록
     memcpy(td->dice, dice, sizeof(dice));
-    memcpy(td->keep, keepArr, sizeof(keepArr));
+    memcpy(td->keep, keep, sizeof(keep));
 }
 
-//----------------------------------------------------------------------
-// 원격 플레이어 턴 처리 (화면에만 출력)
-void processRemoteTurn(int remoteScores[], TurnData* td) {
+
+//-----------------------------------------------------------------------------
+// ▶ 상대 턴 데이터 수신 후 화면에만 표시
+void processRemoteTurn(int sc[], TurnData* td) {
     system("cls");
     printf("=== Opponent's Turn ===\n");
     display_DWC(td->dice, td->keep, -1);
-    printf("Opponent chose category %d, scored %d points.\n",
-        td->category + 1, td->score);
-    remoteScores[td->category] = td->score;
+    printf("Opponent scored %d in category %d\n",
+        td->score, td->category + 1);
+    sc[td->category] = td->score;
     printf("Press any key to continue...\n");
     _getch();
 }
 
-//----------------------------------------------------------------------
-// 호스트/클라이언트 공통 게임 루프
-void playNetworkGame(SOCKET sock, int isHost) {
-    int turn;
-    int myScores[NUM_CATEGORIES], oppScores[NUM_CATEGORIES];
-    for (turn = 0; turn < NUM_CATEGORIES; turn++) {
+//-----------------------------------------------------------------------------
+// ▶ 네트워크 모드 게임 루프 (12 턴)
+void playNetworkGame(SOCKET s, int isHost) {
+    int mySc[NUM_CATEGORIES], opSc[NUM_CATEGORIES];
+    for (int i = 0; i < NUM_CATEGORIES; i++)
+        mySc[i] = opSc[i] = -1;
+
+    for (int turn = 0; turn < NUM_CATEGORIES; turn++) {
         TurnData td;
         if (isHost) {
-            // 1) 내가 먼저
-            playLocalTurn(myScores, &td);
-            sendTurnData(sock, &td);
-
+            // 1) 내 턴
+            playLocalTurn(mySc, &td);
+            sendTurnData(s, &td);
             // 2) 상대 턴 수신
-            if (!recvTurnData(sock, &td)) { printf("Connection lost.\n"); return; }
-            processRemoteTurn(oppScores, &td);
+            if (!recvTurnData(s, &td)) { printf("Connection lost.\n"); return; }
+            processRemoteTurn(opSc, &td);
         }
         else {
-            // 1) 상대 먼저
-            if (!recvTurnData(sock, &td)) { printf("Connection lost.\n"); return; }
-            processRemoteTurn(oppScores, &td);
-
-            // 2) 내가
-            playLocalTurn(myScores, &td);
-            sendTurnData(sock, &td);
+            // 1) 상대 턴 수신
+            if (!recvTurnData(s, &td)) { printf("Connection lost.\n"); return; }
+            processRemoteTurn(opSc, &td);
+            // 2) 내 턴
+            playLocalTurn(mySc, &td);
+            sendTurnData(s, &td);
         }
     }
 
-    // 최종 점수 계산 및 출력
-    int totalMy = 0, totalOpp = 0;
+    // 최종 점수 합산
+    int sumMy = 0, sumOp = 0;
     for (int i = 0; i < NUM_CATEGORIES; i++) {
-        if (myScores[i] != -1) totalMy += myScores[i];
-        if (oppScores[i] != -1) totalOpp += oppScores[i];
+        if (mySc[i] != -1) sumMy += mySc[i];
+        if (opSc[i] != -1) sumOp += opSc[i];
     }
-
-    printf("\n=== Final Results ===\n");
-    printf("You:      %d\nOpponent: %d\n", totalMy, totalOpp);
-    if (totalMy > totalOpp)      printf("You Win!\n");
-    else if (totalMy < totalOpp) printf("You Lose...\n");
-    else                          printf("Draw.\n");
+    printf("\n=== Final Results ===\nYou: %d\nOpponent: %d\n", sumMy, sumOp);
+    if (sumMy > sumOp)  printf("You Win!\n");
+    else if (sumMy < sumOp)  printf("You Lose...\n");
+    else                     printf("Draw.\n");
 }
 
-//----------------------------------------------------------------------
-// 서버 소켓 준비 (호스트)
+
+//-----------------------------------------------------------------------------
+// ▶ 소켓 준비: Host, Client
 SOCKET setupHost(const char* port) {
-    WSADATA wsa;
-    SOCKET listenSock = INVALID_SOCKET, clientSock = INVALID_SOCKET;
-    struct addrinfo hints = { 0 }, * res = NULL;
+    WSADATA wsa;    SOCKET ls, cs;
+    struct addrinfo hint = { 0 }, * res;
+    WSAStartup(MAKEWORD(2, 2), &wsa);
 
-    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) return INVALID_SOCKET;
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
+    hint.ai_family = AF_INET;
+    hint.ai_socktype = SOCK_STREAM;
+    hint.ai_protocol = IPPROTO_TCP;
+    hint.ai_flags = AI_PASSIVE;
 
-    if (getaddrinfo(NULL, port, &hints, &res) != 0) return INVALID_SOCKET;
-    listenSock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    if (listenSock == INVALID_SOCKET) return INVALID_SOCKET;
-    if (bind(listenSock, res->ai_addr, (int)res->ai_addrlen) == SOCKET_ERROR)
-        return INVALID_SOCKET;
-    if (listen(listenSock, 1) == SOCKET_ERROR) return INVALID_SOCKET;
+    getaddrinfo(NULL, port, &hint, &res);
+    ls = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    bind(ls, res->ai_addr, (int)res->ai_addrlen);
+    listen(ls, 1);
 
     printf("Waiting for opponent on port %s...\n", port);
-    clientSock = accept(listenSock, NULL, NULL);
-    closesocket(listenSock);
-    return clientSock;
+    cs = accept(ls, NULL, NULL);
+    closesocket(ls);
+    return cs;
 }
 
-// 클라이언트 소켓 준비 (조인)
 SOCKET setupClient(const char* ip, const char* port) {
-    WSADATA wsa;
-    SOCKET sock = INVALID_SOCKET;
-    struct addrinfo hints = { 0 }, * res = NULL;
+    WSADATA wsa;    SOCKET s;
+    struct addrinfo hint = { 0 }, * res;
+    WSAStartup(MAKEWORD(2, 2), &wsa);
 
-    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) return INVALID_SOCKET;
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
+    hint.ai_family = AF_INET;
+    hint.ai_socktype = SOCK_STREAM;
+    hint.ai_protocol = IPPROTO_TCP;
 
-    if (getaddrinfo(ip, port, &hints, &res) != 0) return INVALID_SOCKET;
-    sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    if (sock == INVALID_SOCKET) return INVALID_SOCKET;
-    if (connect(sock, res->ai_addr, (int)res->ai_addrlen) == SOCKET_ERROR)
+    getaddrinfo(ip, port, &hint, &res);
+    s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if (connect(s, res->ai_addr, (int)res->ai_addrlen) == SOCKET_ERROR)
         return INVALID_SOCKET;
-    return sock;
+    return s;
 }
 
-//----------------------------------------------------------------------
-// main()
+
+//-----------------------------------------------------------------------------
+// ▶ main()
 int main() {
     int mode;
-
     displayWelcomeScreen();
     srand((unsigned)time(NULL));
 
@@ -201,30 +396,24 @@ int main() {
     scanf("%d", &mode);
 
     if (mode == 1) {
-        // 기존 싱글 플레이 루프
-        // (본래 main()의 mode==1 코드 전체를 여기에 복사)
+        // … 여기에 기존 싱글 플레이 전체 루프 복사 …
     }
     else if (mode == 2) {
-        // 기존 VS Computer 루프
-        // (본래 main()의 mode==2 코드 전체를 여기에 복사)
+        // … 여기에 기존 VS Computer 전체 루프 복사 …
     }
     else if (mode == 3) {
-        int netChoice;
+        int nc;
         char ip[128], port[6];
-        SOCKET sock = INVALID_SOCKET;
+        SOCKET sock;
 
-        printf(" Multiplayer:\n");
-        printf(" 1) Host game\n");
-        printf(" 2) Join game\n");
-        printf("Select: ");
-        scanf("%d", &netChoice);
-
+        printf("1) Host game   2) Join game\nSelect: ");
+        scanf("%d", &nc);
         printf("Enter port: ");
         scanf("%5s", port);
 
-        if (netChoice == 1) {
+        if (nc == 1) {
             sock = setupHost(port);
-            if (sock == INVALID_SOCKET) { printf("Host setup failed.\n"); return 1; }
+            if (sock == INVALID_SOCKET) { printf("Host failed.\n"); return 1; }
             printf("Opponent connected!\n");
             playNetworkGame(sock, 1);
         }
@@ -232,8 +421,8 @@ int main() {
             printf("Enter host IP: ");
             scanf("%127s", ip);
             sock = setupClient(ip, port);
-            if (sock == INVALID_SOCKET) { printf("Failed to connect.\n"); return 1; }
-            printf("Connected to host!\n");
+            if (sock == INVALID_SOCKET) { printf("Connect failed.\n"); return 1; }
+            printf("Connected!\n");
             playNetworkGame(sock, 0);
         }
         closesocket(sock);
