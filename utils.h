@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __MAIN_H__
-
+#ifndef __UTILS__
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +8,6 @@
 #include <conio.h>
 #include <Windows.h>
 #include "graphics.h"
-
 
 
 #define NUM_DICE 5
@@ -26,7 +25,6 @@
 #define DEFAULT_COLOR 15  // 기본 색상
 
 
-// 함수 선언
 void rollDice(int dice[], int keep[]);
 void displayDice(int dice[]);
 
@@ -45,6 +43,10 @@ void record_CS(int scores[], int dice[]);
 
 void print_PS(int scores[]);
 void print_CS(int scores[]);
+void setColor(int color);
+void display_SB(int scores[], int numCategories);
+int select_confirm(int dice[], int keep[]);
+void dice_S(int dice[], int keep[]);
 
 
-#endif // !__MAIN_H__
+#endif

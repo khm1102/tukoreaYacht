@@ -109,6 +109,4 @@ void displayWelcomeScreen() {
     printf("      ##    #####    ####    ###  ##     ###             ######   ####     ####     ##### \n");
     printf("  ##### \n");
     printf("******************************************************************************************\n");
-    printf("Welcome to the Yacht Dice Game!\n");
-    printf("Roll the dice and choose categories to score points.\n\n");
 }

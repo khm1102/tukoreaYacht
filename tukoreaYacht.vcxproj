@@ -19,15 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="game.c" />
     <ClCompile Include="graphics.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="socket.c" />
     <ClCompile Include="socketServer.c" />
+    <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="game.h" />
     <ClInclude Include="graphics.h" />
-    <ClInclude Include="main.h" />
+    <ClInclude Include="socket.h" />
     <ClInclude Include="socketClient.h" />
     <ClInclude Include="socketServer.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Test.txt" />
