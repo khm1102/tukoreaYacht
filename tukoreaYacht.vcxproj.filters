@@ -30,6 +30,9 @@
     <ClCompile Include="graphics.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="gamePrint.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -44,9 +47,12 @@
     <ClInclude Include="graphics.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="gamePrint.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Test.txt">
+    <Text Include="Tutorial.txt">
       <Filter>소스 파일\database</Filter>
     </Text>
   </ItemGroup>

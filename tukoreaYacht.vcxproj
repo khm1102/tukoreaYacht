@@ -19,19 +19,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="graphics.c" />
-    <ClCompile Include="main.c" />
+    <ClCompile Include="gamePrint.c" />
+    <ClCompile Include="graphics.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="socketClient.c" />
     <ClCompile Include="socketServer.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="gamePrint.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="socketClient.h" />
     <ClInclude Include="socketServer.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Test.txt" />
+    <Text Include="Tutorial.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
