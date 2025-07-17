@@ -37,6 +37,7 @@ int check_FH(int dice[]);
 int check_LS(int dice[]);
 int check_BS(int dice[]);
 int calc_sum(int dice[], int num);
+int calc_upper_s(int scores[]);
 
 int choice_BC(int scores[], int dice[]);
 void decide_KD(int dice[], int keep[], int targetCategory);

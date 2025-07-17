@@ -18,16 +18,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="socketClient.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="socketServer.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="graphics.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

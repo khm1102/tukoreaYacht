@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="graphics.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="socketClient.c" />
     <ClCompile Include="socketServer.c" />
   </ItemGroup>
   <ItemGroup>
