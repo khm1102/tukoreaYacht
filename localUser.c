@@ -90,7 +90,6 @@ void localPlaySort(int x) {
         return;
     }
 
-    // 데이터 읽어들이기
     ScoreData* arr = NULL;
     size_t cap = 0, size = 0;
     while (fgets(line, sizeof(line), fp)) {
@@ -114,14 +113,13 @@ void localPlaySort(int x) {
 
     qsort(arr, size, sizeof(ScoreData), compareScore);
 
-    // 출력
     printf("=== %s 정렬 결과 ===\n", (sortOrder == 1 ? "오름차순" : "내림차순"));
     printf("localData, comData\n");
     for (size_t i = 0; i < size; i++) {
-//        printf("%d,%d\n", arr[i].local, arr[i].com);
-        printf("%d,%d\n", arr[i].local);
-
+        printf("%d,%d\n", arr[i].local, arr[i].com);
     }
+
+    Sleep(4000);
 
     free(arr);
 }
