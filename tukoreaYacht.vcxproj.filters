@@ -27,6 +27,9 @@
     <ClCompile Include="socketServer.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="graphics.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -38,15 +41,13 @@
     <ClInclude Include="socketServer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="graphics.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Test.txt">
       <Filter>소스 파일\database</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="tukoreaYacht.rc">
-      <Filter>리소스 파일</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>
