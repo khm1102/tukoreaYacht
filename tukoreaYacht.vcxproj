@@ -32,7 +32,7 @@
     <ClInclude Include="gamePrint.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="localUser.h" />
-    <ClInclude Include="socket.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
