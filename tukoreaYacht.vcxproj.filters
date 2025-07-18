@@ -30,9 +30,6 @@
     <ClCompile Include="game.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="socket.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="gamePrint.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
