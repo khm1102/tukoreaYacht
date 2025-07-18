@@ -50,13 +50,13 @@
     <ClInclude Include="game.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="socket.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="gamePrint.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="localUser.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

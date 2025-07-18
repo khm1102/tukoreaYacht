@@ -1,34 +1,72 @@
-#include "localUser.h"
-
+ï»¿#include "localUser.h"
 
 typedef struct {
-    int local;   // »ç¿ëÀÚ Á¡¼ö
-    int com;     // »ó´ë(ÄÄÇ»ÅÍ) Á¡¼ö
+    int local;   // ì‚¬ìš©ì ì ìˆ˜
+    int com;     // ìƒëŒ€(ì»´í“¨í„°) ì ìˆ˜
 } ScoreData;
 
 /*
- * ¿øº» ÆÄÀÏ ±×´ë·ÎÀÇ µ¥ÀÌÅÍ ¹İÈ¯
+ * ì›ë³¸ íŒŒì¼ ê·¸ëŒ€ë¡œì˜ ë°ì´í„° ë°˜í™˜ // select all
  */
 void printAllUserData(void) {
     FILE* fp = fopen("localUser.txt", "r");
     if (!fp) {
-        perror("ÆÄÀÏ ¿­±â ½ÇÆĞ");
+        perror("íŒŒì¼ ì—´ê¸° ì‹¤íŒ¨");
         return;
     }
+
+    // ë©”ëª¨ë¦¬ ë™ì  í• ë‹¹ì„ ìœ„í•œ ì¤€ë¹„
+    ScoreData* arr = NULL;
+    size_t cap = 0, size = 0;
     char line[256];
+
+    // íŒŒì¼ì˜ ê° ì¤„ì„ ì½ì–´ì„œ ë°°ì—´ì— ì €ì¥
     while (fgets(line, sizeof(line), fp)) {
-        fputs(line, stdout);
+        int l, c;
+        if (sscanf(line, "%d,%d", &l, &c) == 2) {
+            if (size == cap) {
+                cap = cap ? cap * 2 : 8;
+                arr = realloc(arr, cap * sizeof(ScoreData));
+                if (!arr) {
+                    perror("ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨");
+                    fclose(fp);
+                    return;
+                }
+            }
+            arr[size].local = l;
+            arr[size].com = c;
+            size++;
+        }
     }
     fclose(fp);
+
+    // í™”ë©´ ì§€ìš°ê¸° (ì›í•˜ì§€ ì•Šìœ¼ë©´ ì£¼ì„ ì²˜ë¦¬)
+    system("cls");
+
+    // í‘œ í—¤ë”
+    printf("=== ì „ì²´ í”Œë ˆì´ ê¸°ë¡ (ì´ %zuíšŒ) ===\n\n", size);
+    printf("+------+------------+------------+\n");
+    printf("|  ìˆœë²ˆ |  ë¡œì»¬ ì ìˆ˜  | ì»´í“¨í„° ì ìˆ˜ |\n");
+    printf("+------+------------+------------+\n");
+
+    // ë°ì´í„° ì¶œë ¥
+    for (size_t i = 0; i < size; i++) {
+        printf("| %4zu | %10d | %10d |\n",
+            i + 1, arr[i].local, arr[i].com);
+    }
+    printf("+------+------------+------------+\n");
+
+    free(arr);
 }
 
+
 /*
- * »ç¿ëÀÚ ÃÑ Á¡¼ö¿Í ´Ù¸¥ ÇÃ·¹ÀÌ¾î Á¡¼ö¸¦ ÆÄÀÏ¿¡ ÇÑ ÁÙ Ãß°¡ ÀúÀå
+ * ì‚¬ìš©ì ì´ ì ìˆ˜ì™€ ë‹¤ë¥¸ í”Œë ˆì´ì–´ ì ìˆ˜ë¥¼ íŒŒì¼ì— í•œ ì¤„ ì¶”ê°€ ì €ì¥ append data
  */
 void saveLocalData(int localTotal, int CTotal) {
     FILE* fp = fopen("localUser.txt", "a");
     if (!fp) {
-        perror("ÆÄÀÏ ¿­±â ½ÇÆĞ");
+        perror("íŒŒì¼ ì—´ê¸° ì‹¤íŒ¨");
         return;
     }
     fprintf(fp, "%d,%d\n", localTotal, CTotal);
@@ -36,24 +74,24 @@ void saveLocalData(int localTotal, int CTotal) {
 }
 
 /*
- * ÇÃ·¹ÀÌÇÑ È½¼ö(µ¥ÀÌÅÍ Çà °³¼ö) ¹İÈ¯
+ * í”Œë ˆì´í•œ íšŸìˆ˜(ë°ì´í„° í–‰ ê°œìˆ˜) ë°˜í™˜
  */
 int localPlayCnt(void) {
     FILE* fp = fopen("localUser.txt", "r");
     if (!fp) {
-        perror("ÆÄÀÏ ¿­±â ½ÇÆĞ");
+        perror("íŒŒì¼ ì—´ê¸° ì‹¤íŒ¨");
         return 0;
     }
     char line[256];
     int count = 0;
-    // Ã¹ ÁÙ(Çì´õ) °Ç³Ê¶Ù±â
+    // ì²« ì¤„(í—¤ë”) ê±´ë„ˆë›°ê¸°
     if (fgets(line, sizeof(line), fp) == NULL) {
         fclose(fp);
         return 0;
     }
-    // ³ª¸ÓÁö ÁÙ ¼¼±â
+    // ë‚˜ë¨¸ì§€ ì¤„ ì„¸ê¸°
     while (fgets(line, sizeof(line), fp)) {
-        // ºó ÁÙÀÌ ¾Æ´Ï¸é Ä«¿îÆ®
+        // ë¹ˆ ì¤„ì´ ì•„ë‹ˆë©´ ì¹´ìš´íŠ¸
         if (strspn(line, "\r\n") != strlen(line))
             count++;
     }
@@ -61,7 +99,7 @@ int localPlayCnt(void) {
     return count;
 }
 
-// qsort ºñ±³¿¡ »ç¿ëÇÒ Àü¿ª Á¤·Ä ¹æÇâ
+// qsort ë¹„êµì— ì‚¬ìš©í•  ì „ì—­ ì •ë ¬ ë°©í–¥
 static int sortOrder = 1;
 static int compareScore(const void* a, const void* b) {
     const ScoreData* s1 = a;
@@ -70,27 +108,26 @@ static int compareScore(const void* a, const void* b) {
 }
 
 /*
- * ÀÚ½ÅÀÇ Á¡¼ö ±âÁØÀ¸·Î ¿À¸§/³»¸²Â÷¼ø Á¤·Ä ÈÄ È­¸é¿¡ Ãâ·Â
- *  x == 1  : ¿À¸§Â÷¼ø
- *  x == -1 : ³»¸²Â÷¼ø
+ * ìì‹ ì˜ ì ìˆ˜ ê¸°ì¤€ìœ¼ë¡œ ì˜¤ë¦„/ë‚´ë¦¼ì°¨ìˆœ ì •ë ¬ í›„ í™”ë©´ì— ì¶œë ¥
+ *  x == 1  : ì˜¤ë¦„ì°¨ìˆœ
+ *  x == -1 : ë‚´ë¦¼ì°¨ìˆœ
  */
 void localPlaySort(int x) {
     sortOrder = (x >= 0 ? 1 : -1);
 
     FILE* fp = fopen("localUser.txt", "r");
     if (!fp) {
-        perror("ÆÄÀÏ ¿­±â ½ÇÆĞ");
+        perror("íŒŒì¼ ì—´ê¸° ì‹¤íŒ¨");
         return;
     }
 
     char line[256];
-    // Çì´õ °Ç³Ê¶Ù±â
+    // í—¤ë”(ì²« ì¤„) ê±´ë„ˆë›°ê¸°
     if (!fgets(line, sizeof(line), fp)) {
         fclose(fp);
         return;
     }
 
-    // µ¥ÀÌÅÍ ÀĞ¾îµéÀÌ±â
     ScoreData* arr = NULL;
     size_t cap = 0, size = 0;
     while (fgets(line, sizeof(line), fp)) {
@@ -100,7 +137,7 @@ void localPlaySort(int x) {
                 cap = cap ? cap * 2 : 8;
                 arr = realloc(arr, cap * sizeof(ScoreData));
                 if (!arr) {
-                    perror("¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ");
+                    perror("ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨");
                     fclose(fp);
                     return;
                 }
@@ -114,14 +151,18 @@ void localPlaySort(int x) {
 
     qsort(arr, size, sizeof(ScoreData), compareScore);
 
-    // Ãâ·Â
-    printf("=== %s Á¤·Ä °á°ú ===\n", (sortOrder == 1 ? "¿À¸§Â÷¼ø" : "³»¸²Â÷¼ø"));
-    printf("localData, comData\n");
+    // í™”ë©´ í´ë¦¬ì–´ í›„ ì˜ˆìœ í‘œë¡œ ì¶œë ¥
+    system("cls");
+    printf("=== %s ì •ë ¬ ê²°ê³¼ (ì´ %zuíšŒ í”Œë ˆì´) ===\n\n",
+        (sortOrder == 1 ? "ì˜¤ë¦„ì°¨ìˆœ" : "ë‚´ë¦¼ì°¨ìˆœ"), size);
+    printf("+------+------------+------------+\n");
+    printf("|  ìˆœìœ„ |  ë¡œì»¬ ì ìˆ˜  | ì»´í“¨í„° ì ìˆ˜ |\n");
+    printf("+------+------------+------------+\n");
     for (size_t i = 0; i < size; i++) {
-//        printf("%d,%d\n", arr[i].local, arr[i].com);
-        printf("%d,%d\n", arr[i].local);
-
+        printf("| %4zu | %10d | %10d |\n",
+            i + 1, arr[i].local, arr[i].com);
     }
+    printf("+------+------------+------------+\n");
 
     free(arr);
 }

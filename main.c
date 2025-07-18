@@ -1,17 +1,6 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include "localUser.h"
-#include "utils.h"
-
+﻿#include "main.h"
 #pragma comment(lib, "ws2_32.lib")
 
-#include "gamePrint.h"
 
 #define PORT        5555
 #define NAME_LEN    32
@@ -99,7 +88,7 @@ void doLocalTurn(SOCKET sock, Player* p) {
     printf("%s 점수: %d\n", p->name, p->scores[cat]);
 }
 
-// 원격 턴
+// 다른 플레이어 턴
 void doRemoteTurn(SOCKET sock, Player* p) {
     Dice d = { {0}, {0} };
     printf("\n[%s의 턴 (관전)]\n", p->name);
@@ -107,8 +96,11 @@ void doRemoteTurn(SOCKET sock, Player* p) {
     for (int r = 0; r < 3; r++) {
         int netValues[NUM_DICE], netKeep[NUM_DICE];
 
-        if (!recvAll(sock, netValues, sizeof(netValues))) exit(1);
-        if (!recvAll(sock, netKeep, sizeof(netKeep)))   exit(1);
+        if (!recvAll(sock, netValues, sizeof(netValues)))
+            exit(1);
+        
+        if (!recvAll(sock, netKeep, sizeof(netKeep)))
+            exit(1);
 
         for (int i = 0; i < NUM_DICE; i++) {
             d.values[i] = ntohl(netValues[i]);
@@ -132,7 +124,6 @@ void doRemoteTurn(SOCKET sock, Player* p) {
         p->name, cat + 1, p->scores[cat]);
 }
 
-// 네트워크 게임 (반환값 사용 안 하므로 void)
 void playNetworkGame(SOCKET sock, int isServer) {
     Player me, opp;
     initPlayer(&me, isServer ? "서버(나)" : "클라이언트(나)");
@@ -149,7 +140,12 @@ void playNetworkGame(SOCKET sock, int isServer) {
             doLocalTurn(sock, &me);
         }
     }
-
+    /*
+    * saveLocalData은 "localUser.c" 함수임.
+    * 호출을 하면 자신의 점수와 상대의 점수를 localUser.txt에 ,(콤마) 기준으로 나눠서 저장함.
+    * print_MS로 스코어보드를 다 출력하는데, 거기서 자신의 점수와 상대의 점수만 포인터로 가지고 와서 호출
+    * 
+    */
     int localData = 0, comData = 0;
     print_MS(me.scores, opp.scores, &localData, &comData);
     saveLocalData(localData, comData);
@@ -242,22 +238,25 @@ int main() {
                 printTutorial();
                 printf("\n읽기 종료: -1 입력 → ");
                 int tmp; scanf("%d", &tmp);
-                if (tmp == -1) break;
+                if (tmp == -1) {
+                    system("cls");
+                    break;
+                }
             }
         }
         else if (mode == 4) {
-            printf("조회: 1: 플레이 수  2: 내역  3: 전체 데이터\n");
+            printf("조회: 1: 플레이 수  2: 전적  3: 전체 데이터\n");
             int opt; scanf("%d", &opt);
             system("cls");
             if (opt == 1) {
                 printf("플레이 수 조회 중...\n");
-                printf("플레이 횟수: %d\n", localPlayCnt());
+                printf("플레이 횟수: %d번 플레이 하셨습니다!\n", localPlayCnt());
             }
             else if (opt == 2) {
                 int order;
-                printf("정렬: 1(오름차순) -1(내림차순)→ ");
+                printf("전적 조회 옵션 (자신의 점수 기준 )\n 1(오름차순) -1(내림차순): ");
                 scanf("%d", &order);
-                localPlaySort(order);
+                if (order == 1 || order == -1)localPlaySort(order);
             }
             else if (opt == 3) {
                 printAllUserData();

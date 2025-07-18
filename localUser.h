@@ -2,6 +2,7 @@
 
 #ifndef LOCALUSER_H
 #define LOCALUSER_H
+//#include <stdio.h>
 #include "utils.h"
 
 // 게임 종료 이후 local 총 점수와 cTotal 게임 데이터를 파일에 저장
@@ -11,7 +12,5 @@ void saveLocalData(int localTotal, int CTotal);
 void localDataSort(int x);
 
 void printAllUserData();
-
-
 
 #endif
