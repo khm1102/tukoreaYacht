@@ -15,7 +15,7 @@ void playMode1() {
 
     // 점수 초기화
     for (int i = 0; i < NUM_CATEGORIES; i++) {
-        PS[i] = 0;
+        PS[i] = -1;
     }
     // 보관 플래그 초기화
     for (int i = 0; i < NUM_DICE; i++) {
@@ -61,7 +61,7 @@ void playMode1() {
             scanf("%d", &category);
             category--;
 
-            if (category >= 0 && category < NUM_CATEGORIES && PS[category] == 0) {
+            if (category >= 0 && category < NUM_CATEGORIES && PS[category] == -1) {
                 PS[category] = calc_score(category, dice);
                 printf("획득 점수: %d\n", PS[category]);
                 chosen = 1;

@@ -2,11 +2,11 @@
 
 void printTutorial() {
 
-    FILE* fp = fopen("Tutorial.txt", "r");
+    FILE* fp = fopen("data/Tutorial.txt", "r");
 
     if (fp == NULL) {
         printf("파일을 열 수 없습니다.\n");
-        return 1;
+        return;
     }
 
     char line[256];

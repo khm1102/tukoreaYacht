@@ -9,7 +9,7 @@ typedef struct {
  * 원본 파일 그대로의 데이터 반환 // select all
  */
 void printAllUserData(void) {
-    FILE* fp = fopen("localUser.txt", "r");
+    FILE* fp = fopen("data/localUser.txt", "r");
     if (!fp) {
         perror("파일 열기 실패");
         return;
@@ -64,7 +64,7 @@ void printAllUserData(void) {
  * 사용자 총 점수와 다른 플레이어 점수를 파일에 한 줄 추가 저장 append data
  */
 void saveLocalData(int localTotal, int CTotal) {
-    FILE* fp = fopen("localUser.txt", "a");
+    FILE* fp = fopen("data/localUser.txt", "a");
     if (!fp) {
         perror("파일 열기 실패");
         return;
@@ -77,7 +77,7 @@ void saveLocalData(int localTotal, int CTotal) {
  * 플레이한 횟수(데이터 행 개수) 반환
  */
 int localPlayCnt(void) {
-    FILE* fp = fopen("localUser.txt", "r");
+    FILE* fp = fopen("data/localUser.txt", "r");
     if (!fp) {
         perror("파일 열기 실패");
         return 0;
@@ -115,7 +115,7 @@ static int compareScore(const void* a, const void* b) {
 void localPlaySort(int x) {
     sortOrder = (x >= 0 ? 1 : -1);
 
-    FILE* fp = fopen("localUser.txt", "r");
+    FILE* fp = fopen("data/localUser.txt", "r");
     if (!fp) {
         perror("파일 열기 실패");
         return;
